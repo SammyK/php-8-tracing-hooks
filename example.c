@@ -8,12 +8,10 @@ void example(void) {
 		.ext = NULL,
 	};
 
-	// instrument SplFixedArray::toArray
+	// instrument all function and method calls
 	zend_instrument_register(
 		(zend_instrument_target) {
-			.type = ZEND_INSTRUMENT_CALL,
-			.classname = "SplFixedArray",
-			.funcname = "toArray",
+			.type = ZEND_INSTRUMENT_ALL_CALLS,
 		},
 		noop);
 
@@ -25,17 +23,30 @@ void example(void) {
 		},
 		noop);
 
-	// instrument PDOStatement::execute
+	// instrument mysqli_connect
 	zend_instrument_register(
 		(zend_instrument_target) {
-			.type = ZEND_INSTRUMENT_CALL,
-			.classname = "SplFixedArray",
-			.funcname = "toArray",
+			.type = ZEND_INSTRUMENT_FCALL,
+			.funcname = "mysqli_connect",
 		},
-		(zend_instrument) {
-			.begin = NULL,
-			.end = NULL,
-			.exception = NULL,
-			.ext = NULL,
-		});
+		noop);
+
+	// instrument SplFixedArray::toArray
+	zend_instrument_register(
+		(zend_instrument_target) {
+			.type = ZEND_INSTRUMENT_MCALL,
+			.classname = "SplFixedArray",
+			.methodname = "toArray",
+		},
+		noop);
+
+	// instrument abstract method
+	zend_instrument_register(
+		(zend_instrument_target) {
+			.type = ZEND_INSTRUMENT_MCALL,
+			.classname = "FilterIterator",
+			.methodname = "accept",
+			.instrument_inheritors = 1,
+		},
+		noop);
 }

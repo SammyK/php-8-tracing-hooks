@@ -15,16 +15,19 @@ struct zend_instrument {
 typedef struct zend_instrument zend_instrument;
 
 struct zend_instrument_target {
-	enum { ZEND_INSTRUMENT_OPCODE, ZEND_INSTRUMENT_CALL } type;
+	enum {
+		ZEND_INSTRUMENT_ALL_CALLS,
+		ZEND_INSTRUMENT_OPCODE,
+		ZEND_INSTRUMENT_FCALL,
+		ZEND_INSTRUMENT_MCALL,
+	} type;
 	union {
 		zend_uchar opcode;
+		const char *funcname;
 		struct {
-			/* 1. Use only funcname to trace a function
-			 * 2. Use both for a method
-			 * 3. Use neither for all function calls
-			 */
+			const char *methodname;
 			const char *classname;
-			const char *funcname;
+			_Bool instrument_inheritors;
 		};
 	};
 };
