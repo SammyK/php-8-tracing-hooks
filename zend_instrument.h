@@ -2,27 +2,27 @@
 #define ZEND_INSTRUMENT_H
 
 #include <Zend/zend.h>
-#include <Zend/zend_vm_opcodes.h>
 
-typedef void (*zend_instrument_fn)(zend_execute_data *, zval *, void *ext);
+typedef void (*zend_instrument_fn)(zend_execute_data *, zval *frame_data, void *instrument_data);
 
 struct zend_instrument {
 	zend_instrument_fn begin;
 	zend_instrument_fn end;
 	zend_instrument_fn exception;
-	void *ext;
+
+	// this is for the INSTRUMENT lifetime, not FRAME lifetime
+	void *instrument_data;
 };
 typedef struct zend_instrument zend_instrument;
 
 struct zend_instrument_target {
 	enum {
 		ZEND_INSTRUMENT_ALL_CALLS,
-		ZEND_INSTRUMENT_OPCODE,
 		ZEND_INSTRUMENT_FCALL,
 		ZEND_INSTRUMENT_MCALL,
 	} type;
+	int flags;
 	union {
-		zend_uchar opcode;
 		const char *funcname;
 		struct {
 			const char *methodname;
